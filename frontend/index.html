@@ -1,0 +1,41 @@
+<html lang="en-us">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.0/fabric.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+    <title>Whoosh</title>
+</head>
+<body>
+    <nav class="navbar navbar-light bg-light header">
+        <h1>Whoosh OH</h1>
+        <p>Office hours yay</p>
+    </nav>
+    <div class="content">
+        <div class="component">
+            <h4 style="text-align: center">Drawing board</h4>
+            <div style="display: flex; flex-direction: row">
+                <div id="sidenav">
+                    <button id="draw-btn" type="button" class="btn">Draw &#9998;</button>
+                    <button id="rect-btn" type="button" class="btn">Rect &#9982;</button>
+                    <button id="text-btn" type="button" class="btn">Text</button>
+                    <button id="delete-btn" type="button" class="btn">Delete &#10006;</button>
+                </div>
+                <div>
+                    <canvas id="demoCanvas" class="canvas"></canvas>
+                </div>
+            </div>
+
+        </div>
+        <div>&nbsp;&nbsp;</div>
+        <div class="component">
+            <h4>Chat, etc</h4>
+            <div class="chat">
+
+            </div>
+        </div>
+    </div>
+    <script src="index.js"></script>
+</body>
+</html>

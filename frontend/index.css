@@ -1,0 +1,38 @@
+body {
+    background-color: #ededed;
+}
+
+.content {
+    display: flex;
+    flex-direction: row;
+    margin-left: 50px;
+    margin-right: 50px;
+}
+
+.component {
+    width: 100%;
+}
+
+.canvas {
+    border: 2px solid darkgray;
+    border-radius: 5px;
+}
+
+#sidenav {
+    width: 80px;
+    text-align: right;
+}
+
+.chat {
+    background-color: white;
+    border: 2px solid darkgray;
+    border-radius: 5px;
+    height: calc(100vh - 200px);
+}
+
+.header {
+    text-align: center;
+    background-color: white;
+    border-radius: 10px;
+    margin: 20px 50px;
+}
