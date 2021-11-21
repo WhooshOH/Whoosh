@@ -1,0 +1,186 @@
+--<!doctype html>
+<html lang="en-us">
+<head>
+    <title>WhooshOH Sign In</title>
+    <style>
+      @font-face {
+        font-family: "SF Pro Text";
+        src: url("fonts/SF-Pro-Text-Bold  .ttf") format("truetype");
+        font-weight: Bold;
+
+      }
+      @font-face {
+        font-family: "SF Pro Text";
+        src: url("fonts/SF-Pro-Text-Semibold.ttf") format("truetype");
+        font-weight: Semibold;
+        
+      }
+      @font-face {
+        font-family: "SF Pro Text";
+        src: url("fonts/SF-Pro-Text-Medium.ttf") format("truetype");
+        font-weight: Medium;
+      }
+      @font-face {
+        font-family: "SF Pro Text";
+        src: url("fonts/SF-Pro-Text-Regular.ttf") format("truetype");
+        font-weight: Regular;
+      }
+    
+      h1{
+        font-family: "SF Pro Text", serif;
+        font-weight: Bold;
+        text-align: left;
+      }
+      h2{
+        font-family: "SF Pro Text", serif;
+        font-weight: Semibold;
+        text-align: center;
+      }
+      label{
+        font-family: "SF Pro Text", serif;
+        font-weight: Regular;
+        text-align: center;
+      }
+      p{
+        font-family: "SF Pro Text", serif;
+        font-weight: Regular;
+        text-align: center;
+      }
+      body{
+          background-color: white;
+      }
+      #navbar{
+          background-color: white;
+          box-shadow: 0 0 10px #ccc;
+          height: 50px;
+          margin: 0px 0px 100px 0px;
+      }
+      #white-box{
+          margin: auto;
+          padding: 20px;
+          
+          height: 50%;
+          width: 40%;
+          background-color: white;
+          box-shadow: 0 0 10px #ccc;
+         
+          border-radius: 25px;
+          text-align: left;
+      }
+      input[type=email], select {
+        width: 80%;
+        padding: 12px 20px;
+        margin: auto;
+        display: inline-block;
+        border: 0px;
+        border-radius: 10px;
+        background-color: #C4C4C425;
+      
+        box-sizing: border-box;
+      }
+      input[type=text], select {
+        width: 80%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        display: inline-block;
+        border: 0px;
+        border-radius: 10px;
+        box-sizing: border-box;
+
+        background-color: #c4c4c425;
+        
+      }
+
+    input[type=forgot] {
+      width: 50%;
+
+      color: #855AE8;
+      margin: 8px 0;
+      display: inline-block;
+      border: none;
+      cursor: pointer;
+    }
+    
+    .loginButton{
+      width: 20%;
+      background-color: #855AE8;
+
+      color: white;
+      padding: 14px 20px;
+      Text-align: center;
+      display: block;
+      margin: 0 auto;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .loginButton.hover{
+      background-color: #B094F0;
+    }
+
+    .backButton{
+      width: 20%;
+      background-color: #4a494d;
+
+      color: white;
+      top:11%;
+      left:2%;
+      width:80px;
+      height:40px;
+      position: absolute;
+      z-index: 2;
+
+      padding: 14px 20px;
+      Text-align: center;
+      display: block;
+      margin: 0 auto;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .backButton.hover{
+      background-color: #636364;
+    }
+    input[type=signUp] {
+      width: 80%;
+      
+      color: black;
+      padding: 25px 4px;
+      margin: 8px 0;
+      Text-align: bottom;
+      display: block;
+      margin: 0 auto;
+      border: none;
+      cursor: pointer;
+    }
+    </style>
+</head>
+<body>
+    <script type = "text/JavaScript">
+      function Hello() {
+        alert("Hello, World");
+      }
+    </script>
+    <nav id="navbar">
+        <a href="/html/"><h1>WhooshOH</h1></a>
+    </nav>
+    <body class="text-center">
+      <form class="form-signin">
+    <div id="white-box">
+        <h2>Log in</h2>
+        <form action = "signIn.jsp" method = "GET">
+            <!--email-->
+          <label for="email_name">Email Address</label><br />
+          <input type = "email" id= "email-id" name= "email_name"> <br />
+            <!--password-->
+          <label for="password">Password</label><br />
+          <input type = "text" name = "last_name" /> <br />
+          <input type = "forgot" value = "Forgot password?"/>
+          <button class="loginButton" type="login">Log In</button>
+          <input type = "signUp" value = "Don't have an account? Sign up here."/>
+          <button class="backButton" type="back">Back</button>
+        </form>
+    </div>
+ </body>
+</html>
