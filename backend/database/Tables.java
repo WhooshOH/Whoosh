@@ -1,7 +1,9 @@
+
 import java.sql.DriverManager;
-import java.util.ArrayList;
 import java.sql.*;
-import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
 public class Tables {
 	static final String DB_URL = "jdbc:mysql://localhost/";
@@ -10,34 +12,70 @@ public class Tables {
 
 	public static void main(String[] args) {
 
-		// need to create db/server and connect?
-		createHostTable();
-		createGuestTable();
-
-		// etc.
 
 	}
 	// consider returning string instead of boolean for error reports
 	// or if going hard returning specific errors...
 
+	public static String getSalt() {
+		String strSalt = null;
+		try {
+			SecureRandom sr = SecureRandom.getInstance("SHA1PRNG");
+			byte[] salt = new byte[16];
+			sr.nextBytes(salt);
+			strSalt = salt.toString();
+		} catch(NoSuchAlgorithmException e) {
+			e.printStackTrace();
+		}
+		return strSalt;
+	}
 	
+	// encrypt password
+	//taken from: https://howtodoinjava.com/java/java-security/how-to-generate-secure-password-hash-md5-sha-pbkdf2-bcrypt-examples/
+	public static String encrypt(String password, String salt) {
+        String generatedPass = null;
+		try {
+            MessageDigest md = MessageDigest.getInstance("SHA-512");
+            md.update(salt.getBytes());
+            byte[] bytes = md.digest(password.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < bytes.length; i++) {
+                sb.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16)
+                        .substring(1));
+            }
+            generatedPass = sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return generatedPass;
+		
+	}
 	/**
 	 * SHA salt and hash ok Use password to encrypt email and check it against all
 	 * stored emails Send back message to indicate successful login/unsuccessful
 	 * login
 	 * 
 	 */
-	public boolean signIn(String email, String password) {
-
-		// encrypt password
-		String sql = "SELECT EncryptedEmail FROM Guest WHERE Email = ?";
+	public static boolean signIn(String email, String password) {
+		
+		String sql = "SELECT EncryptedPassword, Salt FROM Host WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, sql);
-			ps.executeUpdate(sql);
+			ResultSet rs = ps.executeQuery(sql);
 			ps.close();
-			return true;
+			
+			
+			if(rs.next()) {
+				String storedPass = rs.getString("EncryptedPassword");
+				String salt = rs.getString("Salt");
+				
+				String encrypted = encrypt(password, salt);
+				
+				return encrypted.equals(storedPass);
+				
+			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -52,20 +90,22 @@ public class Tables {
 	 * SessionID
 	 * 
 	 */
-	public boolean sessionGeneration(String hostEmail) {
+	public static boolean sessionGeneration(String hostEmail) {
 
-		String sql = "SELECT TABLE Hosts WHERE Email = " + hostEmail;
+		
 
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);) {
-
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			String sql = "SELECT TABLE Hosts WHERE Email = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ResultSet rs = ps.executeQuery(sql);
+			
 			if (rs.next()) {
 				sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
-				PreparedStatement ps = conn.prepareStatement(sql);
+				ps = conn.prepareStatement(sql);
 				ps.setString(1, "True");
 				ps.setString(2, hostEmail);
 				ps.executeUpdate(sql);
+				
 				ps.close();
 				return true;
 			}
@@ -83,7 +123,7 @@ public class Tables {
 	 * sent
 	 * 
 	 */
-	public boolean resetPasswordRequest(String email) {
+	public static boolean resetPasswordRequest(String email) {
 
 		String sql = "SELECT Email FROM Hosts WHERE Email = " + email;
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
@@ -106,17 +146,23 @@ public class Tables {
 	 * password in table Send message back to indicate successful reset
 	 * 
 	 */
-	public boolean resetPassword(String hostEmail, String password) {
+	public static boolean resetPassword(String hostEmail, String password) {
 
-		String encryptedEmail = "";
-		// salt and hash email with password
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			String sql = "UPDATE Guests SET EncryptedEmail = ? WHERE Email = ?";
+			
+			String sql = "SELECT Salt FROM Hosts WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, encryptedEmail);
+			String salt = ps.executeQuery().getString("Salt");
+			
+			String newEncryptedPass = encrypt(password, salt);
+			
+			sql = "UPDATE Hosts SET EncryptedPassword = ? WHERE Email = ?";
+			ps = conn.prepareStatement(sql);
+			ps.setString(1, newEncryptedPass);
 			ps.setString(2, hostEmail);
 			ps.executeUpdate(sql);
+			
 			ps.close();
 			return true;
 
@@ -133,10 +179,9 @@ public class Tables {
 	 * indicate successful update
 	 */
 
-	public boolean updateName(String email, String fName, String lName, boolean host) {
+	public static boolean updateName(String email, String fName, String lName, boolean host) {
 
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
 			String sql = "UPDATE ? SET fName = ?, lName = ? WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -166,11 +211,10 @@ public class Tables {
 	 * indicate successful update
 	 * 
 	 */
-	public boolean updatePronouns(String email, String pronouns, boolean host) {
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();) {
+	public static boolean updatePronouns(String email, String pronouns, boolean host) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
-			String sql = "UPDATE ? SET pronouns = ? WHERE Email = ?";
+			String sql = "UPDATE ? SET Pronouns = ? WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
 			
 			if (host) {
@@ -192,7 +236,7 @@ public class Tables {
 
 	}
 
-	public boolean joinRoom(String guestEmail, String hostEmail) {
+	public static boolean joinRoom(String guestEmail, String hostEmail) {
 		/**
 		 * Check to ensure SessionID is valid If SessionID invalid: send back a message
 		 * saying so Else Store SessionID in Guest table Return successful message
@@ -200,22 +244,22 @@ public class Tables {
 		 */
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			String sql = "SELECT email FROM Hosts WHERE email = ?";
+			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.setString(1, hostEmail);
 			ResultSet rs1 = pr.executeQuery(sql);
 
-			// valid email/session
+			// ensure valid email/session
 			if (rs1.next()) {
 				
 				
 				// ensure guest has no current session
-				sql = "SELECT sessionID FROM Guests WHERE email = ?";
+				sql = "SELECT SessionID FROM Guests WHERE Email = ?";
 				PreparedStatement ps = conn.prepareStatement(sql);
 				ps.setString(1, guestEmail);
 				ResultSet rs2 = ps.executeQuery(sql);
 
-				if (rs2.getString("sessionID").equals("")) {
+				if (rs2.getString("SessionID").equals("")) {
 					// no current session
 					sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
 					ps = conn.prepareStatement(sql);
@@ -242,8 +286,8 @@ public class Tables {
 	}
 
 	// guests leaving session
-	public boolean leaveSession(String guestEmail) {
-		String sql = "UPDATE Guests SET sessionID = ? WHERE Email = ?";
+	public static boolean leaveSession(String guestEmail) {
+		String sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 			PreparedStatement pr = conn.prepareStatement(sql);) {
 			
@@ -268,7 +312,7 @@ public class Tables {
 	 * indicate successful session end
 	 * 
 	 */
-	public boolean endSession(String hostEmail) {
+	public static boolean endSession(String hostEmail) {
 		
 		String sql = "SELECT InSession FROM Hosts WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -276,12 +320,14 @@ public class Tables {
 			pr.setString(1, hostEmail);
 			ResultSet rs = pr.executeQuery();
 			
-			//ensure hosts are in session? 
+			//ensure the host exists
 			if(rs.next()) {
-				if(!(rs.getString("Email").equals(""))) {
+				
+				//ensure host is in session
+				if(rs.getString("InSession").equals("True")) {
 					sql = "UPDATE Hosts SET session ?";
 					pr = conn.prepareStatement(sql);
-					pr.setString(1, "");
+					pr.setString(1, "False");
 					pr.executeUpdate();
 					
 					sql = "UPDATE Guests SET sessionID = ? WHERE sessionID = ?";
@@ -324,18 +370,20 @@ public class Tables {
 	}
 
 	// todo: check valid email, no duplicate email
-	public static boolean insertStudent(String email, String name, String pronouns, String sessionID) {
-		String sql = "INSERT INTO HOSTS (email, name, pronouns, encryptedEmail) VALUES (?,?,?,?)";
+	public static boolean insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
+		String sql = "INSERT INTO HOSTS (email, name, pronouns, encryptedPassword) VALUES (?,?,?,?,?)";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				PreparedStatement stmt = conn.prepareStatement(sql);) {
+				PreparedStatement pr = conn.prepareStatement(sql);) {
 			// get and check for duplicate email
 
-			stmt.setString(1, email);
-			stmt.setString(2, name);
-			stmt.setString(3, pronouns);
-			stmt.setString(4, "");
-			stmt.executeUpdate();
+			pr.setString(1, email);
+			pr.setString(2, fName);
+			pr.setString(3, lName);
+			pr.setString(4, pronouns);
+			pr.setString(4, "");
+			pr.executeUpdate();
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -344,18 +392,24 @@ public class Tables {
 	}
 
 	// todo: check valid email, no duplicate email
-	public static boolean insertHost(String email, String name, String pronouns, String encryptedEmail) {
-		String sql = "INSERT INTO HOSTS (email, name, pronouns, encryptedEmail) VALUES (?,?,?,?)";
+	public static boolean insertHost(String email, String fName, String lName, String pronouns, String password) {
+		String sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, " +
+				"EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?)";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				PreparedStatement stmt = conn.prepareStatement(sql);) {
+				PreparedStatement pr = conn.prepareStatement(sql);) {
 			// get and check for duplicate email
-
-			stmt.setString(1, email);
-			stmt.setString(2, name);
-			stmt.setString(3, pronouns);
-			stmt.setString(4, encryptedEmail);
-			stmt.executeUpdate();
+			String salt = getSalt();
+			
+			pr.setString(1, email);
+			pr.setString(2, fName);
+			pr.setString(3, lName);
+			pr.setString(4, pronouns);
+			pr.setString(5, "False");
+			pr.setString(6, encrypt(email, salt));
+			pr.setString(7, salt);
+			pr.executeUpdate();
+			
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -366,7 +420,16 @@ public class Tables {
 	public static void createHostTable() {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				Statement stmt = conn.createStatement();) {
-			String sql = "CREATE TABLE Hosts";
+			String sql = "CREATE TABLE Hosts" +
+				"(Email STRING not NULL, " + 
+				"FName STRING not NULL, " +
+				"LName STRING, " + 
+				"Pronouns STRING, " +
+				"InSession STRING not NULL, " +
+				"EncryptedPassword not NULL," +
+				"Salt not NULL, " + 
+				"PRIMARY KEY (Email) )";
+		
 			stmt.executeUpdate(sql);
 
 		} catch (SQLException e) {
@@ -377,7 +440,14 @@ public class Tables {
 	public static void createGuestTable() {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				Statement stmt = conn.createStatement();) {
-			String sql = "CREATE TABLE Guests";
+			String sql = "CREATE TABLE Hosts" +
+					"(Email STRING not NULL, " + 
+					"FName STRING not NULL, " +
+					"LName STRING, " + 
+					"Pronouns STRING, " +
+					"SessionID STRING not NULL, " +					"Salt not NULL, " + 
+					"PRIMARY KEY (Email) )";
+			
 			stmt.executeUpdate(sql);
 
 		} catch (SQLException e) {
