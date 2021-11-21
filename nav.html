@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-F3w7mX95PdgyTmZZMECAngseQB83DfGTowi0iMjiWaeVhAn4FJkqJByhZMI3AhiU" crossorigin="anonymous">
+
+    <title></title>
+
+    <style>
+        @font-face {
+            font-family: "SF Pro Text";
+            src: url("fonts/SF-Pro-Text-Regular.otf") format("truetype");
+            font-weight: Regular;
+        }
+
+        .navbar {
+            border-bottom: 1px solid #C4C4C425;
+        }
+
+        /* https://community.plotly.com/t/dash-how-to-change-a-navbars-brand-colour/33509/2 */
+        .navbar-light .navbar-brand {
+            color:#855AE8 !important;
+
+            font-family: "SF Pro Text", serif;
+            font-size: 40px;
+        }
+
+        .nav-link {
+            margin: 15px;
+            color: #C4C4C425;
+            text-decoration: none;
+
+            font-family: "SF Pro Text", serif;
+        }
+
+        #signup-link {
+            background-color: #855AE8;
+            color: white;
+            width: 100px;
+            border-radius: 15px;
+            margin: 15px;
+            text-align: center;
+
+            font-family: "SF Pro Text", serif;
+        }
+
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-light navbar-custom">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Whoosh</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link justify-content-end" href="#">Join a Meeting</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link justify-content-end" href="#">Sign In</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="signup-link justify-content-end" class="nav-link" href="#">Sign Up</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</body>
