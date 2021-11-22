@@ -1,0 +1,65 @@
+<html lang="en-us">
+<head>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.3.0/fabric.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="index.css">
+    -->
+    <title>WhooshOH Sign Up</title>
+    
+    <link rel="stylesheet" href= "guestsignup.css">
+</head>
+<script>
+  function verifyPassword() {  
+    var pw = document.getElementById("pswd").value;  
+    //check empty password field  
+    if(pw == "") {  
+      document.getElementById("message").innerHTML = "Please set password";  
+      return false;  
+    }  
+  }
+
+  document.querySelectorAll('input');
+</script>
+<body>
+    <nav id="navbar">
+      
+    </nav>
+    <div id = back-button> 
+      <h2>Back</h2>
+    </div>
+    <h2 id="title">WhooshOH</h2>
+    <div id="white-box">
+        
+        <form action = "FirstServlet" method = "GET" onsubmit ="return verifyPassword()">
+          <!--name-->
+        <label for="fname"><span class="box-text">First Name</span></label><br />
+        <input type = "email" id= "first-name" name= "fname"> <br />
+        <label for="lname"><span class="box-text">Last Name</span></label><br />
+        <input type = "text" id= "last-name" name= "lname"> <br />
+          <!--pronouns-->
+        <label for="fname"><span class="box-text">Pronouns</span></label><br />
+        <select id="select-id" name="pronouns">
+            <option value="val1">she/her/hers</option>
+            <option value="val2">he/him/his</option>
+            <option value="val3">they/them/theirs</option>
+            <option value="val4">other</option>
+        </select><br />
+          <!--email-->
+        <label for="email"><span class="box-text">Email</span></label><br />
+        <input type = "email" id ="email" name = "email" /> <br />
+          <!--password-->
+        <label for="password"><span class="box-text">Host Session ID</span></label><br />
+        <input type = "text" name = "confirm_password" /> <br />
+  
+        <input type = "submit" value = "Join Session"/>
+      
+         
+        </form>
+
+    </div>
+
+ </body>
+</html>
