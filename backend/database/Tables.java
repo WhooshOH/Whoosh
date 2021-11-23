@@ -11,6 +11,8 @@ import javax.activation.*;
 import javax.mail.Session;
 import javax.mail.Transport;
 
+//have to add activation, mail, and smtp jar files to class path from JavaMail API and JAF
+
 public class Tables {
 	static final String DB_URL = "jdbc:mysql://localhost/";
 	static final String USER = "root";
@@ -55,8 +57,8 @@ public class Tables {
 	}
 
 	/*
-	 * Find host’s table and check if it there’s currently a session If so, return
-	 * an error Else Create a SessionID Store SessionID in Host’s table Return
+	 * Find hostâ€™s table and check if it thereâ€™s currently a session If so, return
+	 * an error Else Create a SessionID Store SessionID in Hostâ€™s table Return
 	 * SessionID
 	 * 
 	 */
