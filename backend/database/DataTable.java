@@ -1,24 +1,32 @@
 import java.sql.*;
 
-public class Tables {
+public class DataTable {
 	static final String DB_URL = "jdbc:mysql://localhost/";
 	static final String USER = "root";
 	static final String PW = "root";
 
-
 	public static void main(String[] args) {
-		Tables tables = new Tables();
-		tables.createGuestTable();
-		tables.createHostTable();
 		
-		//connect to mysql db
+//		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
+//				Statement stmt = conn.createStatement();) {
+//			System.out.println("Connection made! ");
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		
 		
-		while(true) {
-			//get frontend input to do various stuff
-			//e.g. create guest instances, create host instances,
-			//start sessions, etc. 
-		}
+		DataTable dt = new DataTable();
 		
+		dt.createGuestTable();
+		dt.createHostTable();
+				
+//		while(true) {
+//			//get frontend input to do various stuff
+//			//e.g. create guest instances, create host instances,
+//			//start sessions, etc. 
+//		}
+//		
 
 	}
 
@@ -72,16 +80,17 @@ public class Tables {
 				PreparedStatement pr = conn.prepareStatement(sql);) {
 			// get and check for duplicate email
 			String salt = Host.getSalt();
+			String encryptedPassword = Host.encrypt(email, salt);
 			
 			pr.setString(1, email);
 			pr.setString(2, fName);
 			pr.setString(3, lName);
 			pr.setString(4, pronouns);
 			pr.setString(5, "False");
-			pr.setString(6, Host.encrypt(email, salt));
+			pr.setString(6, encryptedPassword);
 			pr.setString(7, salt);
 			pr.executeUpdate();
-			
+						
 			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();

@@ -6,7 +6,9 @@ import java.security.SecureRandom;
 public class Host extends Guest {
 	// consider returning string instead of boolean for error reports
 	// or if going hard returning specific errors...
-
+	
+	//consider: adding array of guests here 
+	
 	public static String getSalt() {
 		String strSalt = null;
 		try {
@@ -46,7 +48,7 @@ public class Host extends Guest {
 	 * login
 	 * 
 	 */
-	private boolean logIn(String email, String password) {
+	private String logIn(String email, String password) {
 		
 		String sql = "SELECT EncryptedPassword, Salt FROM Host WHERE Email = ?";
 
@@ -63,14 +65,14 @@ public class Host extends Guest {
 				
 				String encrypted = encrypt(password, salt);
 				
-				return encrypted.equals(storedPass);
+				if(encrypted.equals(storedPass)) return "";
 				
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Username/Password Incorrect";
 
 	}
 	
@@ -81,9 +83,7 @@ public class Host extends Guest {
 	 * SessionID
 	 * 
 	 */
-	private boolean sessionGeneration(String hostEmail) {
-
-		
+	private String sessionGeneration(String hostEmail) {
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			String sql = "SELECT TABLE Hosts WHERE Email = ?";
@@ -98,13 +98,29 @@ public class Host extends Guest {
 				ps.executeUpdate(sql);
 				
 				ps.close();
-				return true;
+				return "";
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could Not Generate Session";
+
+	}
+	
+	private int getNumGuestsInSession(String hostEmail) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			String sql = "SELECT COUNT(*) FROM Guests WHERE Email = ?";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, hostEmail);
+			ResultSet rs = ps.executeQuery(sql);
+			
+			//0 is the column index...I think. SQL indexes generally start with 1
+			return rs.getInt(1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
 
 	}
 	
@@ -117,10 +133,12 @@ public class Host extends Guest {
 	 */
 	private boolean resetPasswordRequest(String email) {
 
-		String sql = "SELECT Email FROM Hosts WHERE Email = " + email;
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();
-				ResultSet rs = stmt.executeQuery(sql);) {
+		String sql = "SELECT Email FROM Hosts WHERE Email = ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			
 			if (rs.next()) {
 
 				// send link to email
