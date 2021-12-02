@@ -7,20 +7,21 @@ public class DataTable {
 
 	public static void main(String[] args) {
 		
-//		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-//				Statement stmt = conn.createStatement();) {
-//			System.out.println("Connection made! ");
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
+				Statement stmt = conn.createStatement();) {
+			System.out.println("Connection made! ");
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		
+//		DataTable dt = new DataTable();
 //		
-		
-		DataTable dt = new DataTable();
-		
-		dt.createGuestTable();
-		dt.createHostTable();
-				
+//		dt.createGuestTable();
+//		dt.createHostTable();
+//		
+//		Host h = new Host();
 //		while(true) {
 //			//get frontend input to do various stuff
 //			//e.g. create guest instances, create host instances,
@@ -39,7 +40,7 @@ public class DataTable {
 					"LName STRING, " + 
 					"Pronouns STRING, " +
 					"SessionID STRING not NULL, " +					
-					"Salt not NULL, " + 
+					"Active not NULL, " + 
 					"PRIMARY KEY (Email) )";
 			
 			stmt.executeUpdate(sql);
@@ -72,7 +73,7 @@ public class DataTable {
 	
 
 	// todo: check valid email, no duplicate email
-	public boolean insertHost(String email, String fName, String lName, String pronouns, String password) {
+	public String insertHost(String email, String fName, String lName, String pronouns, String password) {
 		String sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, " +
 				"EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?)";
 
@@ -91,18 +92,17 @@ public class DataTable {
 			pr.setString(7, salt);
 			pr.executeUpdate();
 						
-			return true;
+			return "Sucessfully inserted host.";
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could not insert host.";
 	}
 	
 
 	// todo: check valid email, no duplicate email
-	private static boolean insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
-		String sql = "INSERT INTO HOSTS (email, name, pronouns, encryptedPassword) VALUES (?,?,?,?,?)";
-
+	private static String insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
+		String sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement pr = conn.prepareStatement(sql);) {
 			// get and check for duplicate email
@@ -111,14 +111,15 @@ public class DataTable {
 			pr.setString(2, fName);
 			pr.setString(3, lName);
 			pr.setString(4, pronouns);
-			pr.setString(4, "");
+			pr.setString(5, "");
+			pr.setString(6, "false");
 			pr.executeUpdate();
 			
-			return true;
+			return "Successfully inserted guest.";
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could not insert guest.";
 	}
 	
 

@@ -12,7 +12,7 @@ public class Guest {
 	 * indicate successful update
 	 */
 
-	public boolean updateName(String email, String fName, String lName, boolean host) {
+	protected String updateName(String email, String fName, String lName, boolean host) {
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
@@ -30,12 +30,12 @@ public class Guest {
 			ps.setString(4, email);
 			ps.executeUpdate(sql);
 			ps.close();
-			return true;
+			return "Name successfully updated!";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could not update name. Try again.";
 
 	}
 
@@ -44,7 +44,7 @@ public class Guest {
 	 * indicate successful update
 	 * 
 	 */
-	public boolean updatePronouns(String email, String pronouns, boolean host) {
+	protected String updatePronouns(String email, String pronouns, boolean host) {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
 			String sql = "UPDATE ? SET Pronouns = ? WHERE Email = ?";
@@ -60,12 +60,12 @@ public class Guest {
 			ps.setString(3, email);
 			ps.executeUpdate(sql);
 			ps.close();
-			return true;
+			return "Pronouns updated successfully.";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could not update pronouns. Try again.";
 
 	}
 
@@ -75,7 +75,7 @@ public class Guest {
 	 * saying so Else Store SessionID in Guest table Return successful message
 	 * 
 	 */
-	private boolean joinRoom(String guestEmail, String hostEmail) {
+	protected String joinRoom(String guestEmail, String hostEmail) {
 
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -96,9 +96,9 @@ public class Guest {
 
 				if (rs2.getString("SessionID").equals("")) {
 					// no current session
-					sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
+					sql = "UPDATE Guests SET Active = ? WHERE Email = ?";
 					ps = conn.prepareStatement(sql);
-					ps.setString(1, hostEmail);
+					ps.setString(1, "true");
 					ps.setString(2, guestEmail);
 					ps.executeUpdate(sql);
 					
@@ -108,7 +108,7 @@ public class Guest {
 					
 					
 					
-					return true;
+					return "Succesfully joined room " + hostEmail;
 				}
 				
 				rs2.close();
@@ -119,26 +119,27 @@ public class Guest {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Could not join room.";
 	}
 
 	// guests leaving session
-	private static boolean leaveSession(String guestEmail) {
-		String sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
+	private static String leaveSession(String guestEmail) {
+		String sql = "UPDATE Guests SET SessionID = ?, Active = ? WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 			PreparedStatement pr = conn.prepareStatement(sql);) {
 			
 			pr.setString(1, "");
-			pr.setString(2, guestEmail);
+			pr.setString(2, "false");
+			pr.setString(3, guestEmail);
 			pr.executeUpdate();
 			
-			return true;
+			return "Successfully left room. ";
 				
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
 		
-		return false;
+		return "Could not leaave room.";
 	}
 	
 

@@ -72,7 +72,7 @@ public class Host extends Guest {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return "Username/Password Incorrect";
+		return "Username/Password incorrect";
 
 	}
 	
@@ -104,11 +104,11 @@ public class Host extends Guest {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return "Could Not Generate Session";
+		return "Could not generate session.";
 
 	}
 	
-	private int getNumGuestsInSession(String hostEmail) {
+	private String getNumGuestsInSession(String hostEmail) {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			String sql = "SELECT COUNT(*) FROM Guests WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
@@ -116,12 +116,11 @@ public class Host extends Guest {
 			ResultSet rs = ps.executeQuery(sql);
 			
 			//0 is the column index...I think. SQL indexes generally start with 1
-			return rs.getInt(1);
+			return rs.getString(1);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return 0;
-
+		return "";
 	}
 	
 	
@@ -131,7 +130,7 @@ public class Host extends Guest {
 	 * sent
 	 * 
 	 */
-	private boolean resetPasswordRequest(String email) {
+	private String resetPasswordRequest(String email) {
 
 		String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -142,13 +141,13 @@ public class Host extends Guest {
 			if (rs.next()) {
 
 				// send link to email
-				return true;
+				return "Password Reset Link Successfully Sent";
 			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Failed to send password reset link. Try again.";
 	}
 
 	/*
@@ -156,7 +155,7 @@ public class Host extends Guest {
 	 * password in table Send message back to indicate successful reset
 	 * 
 	 */
-	private boolean resetPassword(String hostEmail, String password) {
+	private String resetPassword(String hostEmail, String password) {
 
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -174,12 +173,12 @@ public class Host extends Guest {
 			ps.executeUpdate(sql);
 			
 			ps.close();
-			return true;
+			return "Password reset successfully";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Password not reset successfully. Try again." ;
 	}
 	
 
@@ -192,7 +191,7 @@ public class Host extends Guest {
 	 * indicate successful session end
 	 * 
 	 */
-	public boolean endSession(String hostEmail) {
+	public String endSession(String hostEmail) {
 		
 		String sql = "SELECT InSession FROM Hosts WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -210,15 +209,14 @@ public class Host extends Guest {
 					pr.setString(1, "False");
 					pr.executeUpdate();
 					
-					sql = "UPDATE Guests SET sessionID = ? WHERE sessionID = ?";
+					sql = "DELETE FROM Guests WHERE sessionID = ?";
 					pr = conn.prepareStatement(sql);
-					pr.setString(1,  "");
-					pr.setString(2, hostEmail);
+					pr.setString(1,  hostEmail);
 					pr.executeUpdate();
 					
 					rs.close();
 					pr.close();
-					return true;
+					return "Session ended.";
 				}
 			}
 
@@ -228,7 +226,7 @@ public class Host extends Guest {
 		} catch(SQLException e) {
 			e.printStackTrace();
 		}
-		return false;
+		return "Session failed to end. Try again. ";
 	}
 
 
