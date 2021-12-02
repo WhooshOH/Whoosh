@@ -13,11 +13,9 @@ public class Guest {
 	 */
 
 	protected String updateName(String email, String fName, String lName, boolean host) {
-
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			
-			String sql = "UPDATE ? SET fName = ?, lName = ? WHERE Email = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
+		String sql = "UPDATE ? SET fName = ?, lName = ? WHERE Email = ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
+				PreparedStatement ps = conn.prepareStatement(sql);) {
 			
 			if (host) {
 				ps.setString(1, "Hosts");
@@ -29,7 +27,6 @@ public class Guest {
 			ps.setString(3, lName);
 			ps.setString(4, email);
 			ps.executeUpdate(sql);
-			ps.close();
 			return "Name successfully updated!";
 
 		} catch (SQLException e) {
@@ -45,10 +42,10 @@ public class Guest {
 	 * 
 	 */
 	protected String updatePronouns(String email, String pronouns, boolean host) {
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+		String sql = "UPDATE ? SET Pronouns = ? WHERE Email = ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
+				PreparedStatement ps = conn.prepareStatement(sql);) {
 			
-			String sql = "UPDATE ? SET Pronouns = ? WHERE Email = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
 			
 			if (host) {
 				ps.setString(1, "Hosts");
@@ -59,7 +56,6 @@ public class Guest {
 			ps.setString(2, pronouns);
 			ps.setString(3, email);
 			ps.executeUpdate(sql);
-			ps.close();
 			return "Pronouns updated successfully.";
 
 		} catch (SQLException e) {
@@ -76,8 +72,6 @@ public class Guest {
 	 * 
 	 */
 	protected String joinRoom(String guestEmail, String hostEmail) {
-
-
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 			PreparedStatement pr = conn.prepareStatement(sql);
@@ -98,7 +92,7 @@ public class Guest {
 					// no current session
 					sql = "UPDATE Guests SET Active = ? WHERE Email = ?";
 					ps = conn.prepareStatement(sql);
-					ps.setString(1, "true");
+					ps.setString(1, "True");
 					ps.setString(2, guestEmail);
 					ps.executeUpdate(sql);
 					
@@ -129,7 +123,7 @@ public class Guest {
 			PreparedStatement pr = conn.prepareStatement(sql);) {
 			
 			pr.setString(1, "");
-			pr.setString(2, "false");
+			pr.setString(2, "False");
 			pr.setString(3, guestEmail);
 			pr.executeUpdate();
 			

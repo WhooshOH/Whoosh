@@ -32,18 +32,17 @@ public class DataTable {
 	}
 
 	private void createGuestTable() {
+		String sql = "CREATE TABLE Hosts" +
+				"(Email STRING not NULL, " + 
+				"FName STRING not NULL, " +
+				"LName STRING, " + 
+				"Pronouns STRING, " +
+				"SessionID STRING not NULL, " +					
+				"Active not NULL, " + 
+				"PRIMARY KEY (Email) )";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();) {
-			String sql = "CREATE TABLE Hosts" +
-					"(Email STRING not NULL, " + 
-					"FName STRING not NULL, " +
-					"LName STRING, " + 
-					"Pronouns STRING, " +
-					"SessionID STRING not NULL, " +					
-					"Active not NULL, " + 
-					"PRIMARY KEY (Email) )";
-			
-			stmt.executeUpdate(sql);
+				PreparedStatement pr = conn.prepareStatement(sql);) {			
+			pr.executeUpdate();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -52,9 +51,7 @@ public class DataTable {
 	
 
 	public void createHostTable() {
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();) {
-			String sql = "CREATE TABLE Hosts" +
+		String sql = "CREATE TABLE Hosts" +
 				"(Email STRING not NULL, " + 
 				"FName STRING not NULL, " +
 				"LName STRING, " + 
@@ -64,7 +61,9 @@ public class DataTable {
 				"Salt not NULL, " + 
 				"PRIMARY KEY (Email) )";
 		
-			stmt.executeUpdate(sql);
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
+				PreparedStatement pr = conn.prepareStatement(sql);) {
+			pr.executeUpdate();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
