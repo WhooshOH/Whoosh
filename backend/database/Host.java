@@ -170,7 +170,14 @@ public class Host extends Guest {
 
 			String sql = "SELECT Salt FROM Hosts WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
-			String salt = ps.executeQuery().getString("Salt");
+			ps.setString(1, hostEmail);
+			ResultSet rs = ps.executeQuery();
+			
+			String salt = "";
+			if(rs.next()) {
+				salt = ps.executeQuery().getString("Salt");
+				rs.close();
+			}
 
 			String newEncryptedPass = encrypt(password, salt);
 
