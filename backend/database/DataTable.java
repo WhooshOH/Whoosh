@@ -4,11 +4,9 @@ public class DataTable {
 	static final String DB_URL = "jdbc:mysql://localhost:3306/cs201final?";//?allowPublicKeyRetrieval=true&useSSL=false";
 	static final String USER = "root";
 	static final String PW = "root";
-	static DataTable dt;
-	static Guest g;
-	static Host h;
 	
-//	public static void i(String[] args) {
+	public static void main(String[] args) {
+		createGuestTable();
 //		String sql = "Connection ?";
 //		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 //			dt = new DataTable();
@@ -22,26 +20,12 @@ public class DataTable {
 //		} catch (SQLException e) {
 //			e.printStackTrace();
 //		}
-				
-		
-//		DataTable dt = new DataTable();
-//		
-//		dt.createGuestTable();
-//		dt.createHostTable();
-//		
-//		Host h = new Host();
-//		while(true) {
-//			//get frontend input to do various stuff
-//			//e.g. create guest instances, create host instances,
-//			//start sessions, etc. 
-//		}
-//		
+			
 
-//	}
+	}
 
 	public static void initialize() {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			dt = new DataTable();
 			DataTable.createGuestTable();
 			DataTable.createHostTable();
 		} catch (SQLException e) {
@@ -49,53 +33,93 @@ public class DataTable {
 		}
 	}
 	
-	//add checks for limits and strig and hash
 	public static void createGuestTable() {
+		String sql = "CREATE TABLE Guests" +
+				"(Email VARCHAR(100) not NULL, " + 
+				"FName VARCHAR(100) not NULL, " +
+				"LName VARCHAR(100), " + 
+				"Pronouns VARCHAR(100), " +
+				"SessionID VARCHAR(100) not NULL, " +					
+				"Active VARCHAR(5) not NULL, " + 
+				"PRIMARY KEY (Email) )";
 		
-		String sql = "DROP TABLE Guests";
-
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {		
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.executeUpdate();
-			sql = 	"CREATE TABLE Guests" +
-					"(Email VARCHAR(100) not NULL, " + 
-					"FName VARCHAR(100) not NULL, " +
-					"LName VARCHAR(100), " + 
-					"Pronouns VARCHAR(100), " +
-					"SessionID VARCHAR(100) not NULL, " +					
-					"Active VARCHAR(5) not NULL, " + 
-					"PRIMARY KEY (Email) )";
-			pr = conn.prepareStatement(sql);
-			pr.executeUpdate();
-			pr.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+			
+		} catch(SQLSyntaxErrorException e) {
+			sql = "DROP TABLE Guests";
+			
+			try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {		
+				PreparedStatement pr = conn.prepareStatement(sql);
+				pr.executeUpdate();
+				
+				sql = 	"CREATE TABLE Guests" +
+						"(Email VARCHAR(100) not NULL, " + 
+						"FName VARCHAR(100) not NULL, " +
+						"LName VARCHAR(100), " + 
+						"Pronouns VARCHAR(100), " +
+						"SessionID VARCHAR(100) not NULL, " +					
+						"Active VARCHAR(5) not NULL, " + 
+						"PRIMARY KEY (Email) )";
+				pr = conn.prepareStatement(sql);
+				pr.executeUpdate();
+				pr.close();
+				
+			} catch(Exception ex) {
+				System.out.println("Something went wrong!");
+			}
+		} catch(Exception e) {
+			System.out.println("Something went wrong!");
 		}
+		
 	}
 	
 
 	public static void createHostTable() {
-		String sql = "DROP TABLE Hosts";
-
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+		
+		String sql = "CREATE TABLE Hosts" +
+				"(Email VARCHAR(100) not NULL, " + 
+				"FName VARCHAR(100) not NULL, " +
+				"LName VARCHAR(100), " + 
+				"Pronouns VARCHAR(100), " +
+				"InSession VARCHAR(5) not NULL, " +
+				"EncryptedPassword VARCHAR(1000) not NULL," +
+				"Salt VARCHAR(1000) not NULL, " + 
+				"PRIMARY KEY (Email) )";
+		
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {		
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.executeUpdate();
 			
-			sql = "CREATE TABLE Hosts" +
-			"(Email VARCHAR(100) not NULL, " + 
-			"FName VARCHAR(100) not NULL, " +
-			"LName VARCHAR(100), " + 
-			"Pronouns VARCHAR(100), " +
-			"InSession VARCHAR(5) not NULL, " +
-			"EncryptedPassword VARCHAR(1000) not NULL," +
-			"Salt VARCHAR(1000) not NULL, " + 
-			"PRIMARY KEY (Email) )";
-			pr = conn.prepareStatement(sql);
-			pr.executeUpdate();
-			pr.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch(SQLSyntaxErrorException e) {
+			sql = "DROP TABLE Hosts";
+			
+			try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {		
+				PreparedStatement pr = conn.prepareStatement(sql);
+				pr.executeUpdate();
+				
+				sql = 	"CREATE TABLE Hosts" +
+						"(Email VARCHAR(100) not NULL, " + 
+						"FName VARCHAR(100) not NULL, " +
+						"LName VARCHAR(100), " + 
+						"Pronouns VARCHAR(100), " +
+						"InSession VARCHAR(5) not NULL, " +
+						"EncryptedPassword VARCHAR(1000) not NULL," +
+						"Salt VARCHAR(1000) not NULL, " + 
+						"PRIMARY KEY (Email) )";
+				
+				pr = conn.prepareStatement(sql);
+				pr.executeUpdate();
+				pr.close();
+				
+			} catch(Exception ex) {
+				System.out.println("Something went wrong!");
+			}
+		} catch(Exception e) {
+			System.out.println("Something went wrong!");
 		}
+
 	}
 	
 
