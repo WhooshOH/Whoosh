@@ -154,7 +154,7 @@ public class DataTable {
 			pr.setString(7, salt);
 			pr.executeUpdate();
 						
-			return "Sucessfully inserted host.";
+			return "";
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -184,7 +184,7 @@ public class DataTable {
 			pr.setString(6, "false");
 			pr.executeUpdate();
 			
-			return "Successfully inserted guest.";
+			return "";
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
