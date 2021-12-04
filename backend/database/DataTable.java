@@ -12,8 +12,14 @@ public class DataTable {
 			System.out.println(sql);
 			dt.createGuestTable();
 			dt.createHostTable();
-			insertGuest("test@usc.edu", "Leon", "Zha", "he/him/his/", "testSession");
-			
+			insertHost("test@usc.edu", "Bob", "Joe", "he/him/his/", "testSession");
+			insertGuest("test2@usc.edu", "Leon", "Zha", "he/him/his/", "test@usc.edu");
+
+			Guest g = new Guest();
+			Host h = new Host();
+			g.updateName("test@usc.edu", "Luncida", "Quintal?", false);
+		//	protected String updateName(String email, String fName, String lName, boolean host);
+			System.out.println("num guests: " + h.getNumGuestsInSession("test@usc.edu"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -73,8 +79,8 @@ public class DataTable {
 			"LName VARCHAR(20), " + 
 			"Pronouns VARCHAR(20), " +
 			"InSession VARCHAR(20) not NULL, " +
-			"EncryptedPassword VARCHAR(100) not NULL," +
-			"Salt VARCHAR(100) not NULL, " + 
+			"EncryptedPassword VARCHAR(1000) not NULL," +
+			"Salt VARCHAR(1000) not NULL, " + 
 			"PRIMARY KEY (Email) )";
 			pr = conn.prepareStatement(sql);
 			pr.executeUpdate();
@@ -86,7 +92,7 @@ public class DataTable {
 	
 
 	// todo: check valid email, no duplicate email
-	public String insertHost(String email, String fName, String lName, String pronouns, String password) {
+	public static String insertHost(String email, String fName, String lName, String pronouns, String password) {
 		String sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, " +
 				"EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?)";
 
@@ -94,7 +100,7 @@ public class DataTable {
 				PreparedStatement pr = conn.prepareStatement(sql);) {
 			// get and check for duplicate email
 			String salt = Host.getSalt();
-			String encryptedPassword = Host.encrypt(email, salt);
+			String encryptedPassword = Host.encrypt(password, salt);
 			
 			pr.setString(1, email);
 			pr.setString(2, fName);

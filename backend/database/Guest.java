@@ -1,8 +1,7 @@
 import java.sql.*;
 
 public class Guest {
-	static final String DB_URL = "jdbc:mysql://localhost/";
-
+	static final String DB_URL = "jdbc:mysql://localhost:3306/cs201final?";
 	static final String USER = "root";
 	static final String PW = "root";
 
@@ -13,21 +12,21 @@ public class Guest {
 	 * indicate successful update
 	 */
 
-	protected String updateName(String email, String fName, String lName, boolean host) {
-		String sql = "UPDATE ? SET fName = ?, lName = ? WHERE Email = ?";
+	public String updateName(String email, String fName, String lName, boolean host) {
+		String sql = "";
+		if(host) {
+			sql = "UPDATE Hosts SET fName=?, lName=? WHERE Email=?";
+		} else {
+			sql = "UPDATE Guests SET fName=?, lName=? WHERE Email=?";
+		}
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql);) {
 			
-			if (host) {
-				ps.setString(1, "Hosts");
-			} else {
-				ps.setString(1,  "Guests");
-			}
+			ps.setString(1, fName);
+			ps.setString(2, lName);
+			ps.setString(3, email);
+			ps.executeUpdate();
 			
-			ps.setString(2, fName);
-			ps.setString(3, lName);
-			ps.setString(4, email);
-			ps.executeUpdate(sql);
 			return "Name successfully updated!";
 
 		} catch (SQLException e) {
@@ -43,20 +42,19 @@ public class Guest {
 	 * 
 	 */
 	protected String updatePronouns(String email, String pronouns, boolean host) {
-		String sql = "UPDATE ? SET Pronouns = ? WHERE Email = ?";
+		String sql = "";
+		if(host) {
+			sql = "UPDATE Hosts SET Pronouns = ? WHERE Email = ?";
+		} else {
+			sql = "UPDATE Guests SET Pronouns = ? WHERE Email = ?";
+		}
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql);) {
 			
+			ps.setString(1, pronouns);
+			ps.setString(2, email);
+			ps.executeUpdate();
 			
-			if (host) {
-				ps.setString(1, "Hosts");
-			} else {
-				ps.setString(1,  "Guests");
-			}
-			
-			ps.setString(2, pronouns);
-			ps.setString(3, email);
-			ps.executeUpdate(sql);
 			return "Pronouns updated successfully.";
 
 		} catch (SQLException e) {
@@ -77,7 +75,7 @@ public class Guest {
 			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.setString(1, hostEmail);
-			ResultSet rs1 = pr.executeQuery(sql);
+			ResultSet rs1 = pr.executeQuery();
 
 			// ensure valid email/session
 			if (rs1.next()) {
@@ -87,7 +85,7 @@ public class Guest {
 				sql = "SELECT SessionID FROM Guests WHERE Email = ?";
 				PreparedStatement ps = conn.prepareStatement(sql);
 				ps.setString(1, guestEmail);
-				ResultSet rs2 = ps.executeQuery(sql);
+				ResultSet rs2 = ps.executeQuery();
 
 				if (rs2.getString("SessionID").equals("")) {
 					// no current session
@@ -95,7 +93,7 @@ public class Guest {
 					ps = conn.prepareStatement(sql);
 					ps.setString(1, "True");
 					ps.setString(2, guestEmail);
-					ps.executeUpdate(sql);
+					ps.executeUpdate();
 					
 					rs1.close();
 					rs2.close();
@@ -107,9 +105,10 @@ public class Guest {
 				}
 				
 				rs2.close();
+				rs1.close();
+				pr.close();
 			}
 			
-			rs1.close();
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -144,7 +143,7 @@ public class Guest {
 		int index = email.indexOf("@");
 
 		// pretty sure usc emails need to be at least 3 chars long
-		if (index < 3) {
+		if (index < 3 || index > 100) {
 			return false;
 		}
 

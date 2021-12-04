@@ -56,7 +56,7 @@ public class Host extends Guest {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql);) {
 			ps.setString(1, email);
-			ResultSet rs = ps.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
 				String storedPass = rs.getString("EncryptedPassword");
@@ -89,7 +89,7 @@ public class Host extends Guest {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, hostEmail);
-			ResultSet rs = ps.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
 				sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
@@ -109,16 +109,22 @@ public class Host extends Guest {
 
 	}
 
-	private String getNumGuestsInSession(String hostEmail) {
-		String sql = "SELECT COUNT(*) FROM Guests WHERE Email = ?";
+	public String getNumGuestsInSession(String hostEmail) {
+		String sql = "SELECT COUNT(*) FROM Guests WHERE SessionID = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
 			ps.setString(1, hostEmail);
-			ResultSet rs = ps.executeQuery(sql);
+			ResultSet rs = ps.executeQuery();
 
 			// 0 is the column index...I think. SQL indexes generally start with 1
-			String numGuests = rs.getString(1);
-			rs.close();
+			String numGuests = "";
+			if(rs.next()) {
+				numGuests = rs.getString(1);
+				rs.close();
+			} else {
+				numGuests = "0";
+			}
+			System.out.println("Here: " + numGuests);
 
 			return numGuests;
 		} catch (SQLException e) {
@@ -172,7 +178,7 @@ public class Host extends Guest {
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, newEncryptedPass);
 			ps.setString(2, hostEmail);
-			ps.executeUpdate(sql);
+			ps.executeUpdate();
 
 			ps.close();
 			return "Password reset successfully";
@@ -219,7 +225,6 @@ public class Host extends Guest {
 			}
 
 			pr.close();
-			rs.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
