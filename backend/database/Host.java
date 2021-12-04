@@ -49,7 +49,7 @@ public class Host extends Guest {
 	 * login
 	 * 
 	 */
-	private String logIn(String email, String password) {
+	public static String logIn(String email, String password) {
 
 		String sql = "SELECT EncryptedPassword, Salt FROM Host WHERE Email = ?";
 
@@ -83,7 +83,7 @@ public class Host extends Guest {
 	 * SessionID
 	 * 
 	 */
-	private String sessionGeneration(String hostEmail) {
+	public static String sessionGeneration(String hostEmail) {
 		String sql = "SELECT TABLE Hosts WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -109,7 +109,7 @@ public class Host extends Guest {
 
 	}
 
-	public String getNumGuestsInSession(String hostEmail) {
+	public static String getNumGuestsInSession(String hostEmail) {
 		String sql = "SELECT COUNT(*) FROM Guests WHERE SessionID = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -139,7 +139,7 @@ public class Host extends Guest {
 	 * sent
 	 * 
 	 */
-	private String resetPasswordRequest(String email) {
+	private static String resetPasswordRequest(String email) {
 
 		String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
@@ -164,7 +164,7 @@ public class Host extends Guest {
 	 * password in table Send message back to indicate successful reset
 	 * 
 	 */
-	private String resetPassword(String hostEmail, String password) {
+	private static String resetPassword(String hostEmail, String password) {
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 
@@ -195,7 +195,7 @@ public class Host extends Guest {
 	 * indicate successful session end
 	 * 
 	 */
-	public String endSession(String hostEmail) {
+	public static String endSession(String hostEmail) {
 
 		String sql = "SELECT InSession FROM Hosts WHERE Email = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {

@@ -12,7 +12,7 @@ public class Guest {
 	 * indicate successful update
 	 */
 
-	public String updateName(String email, String fName, String lName, boolean host) {
+	public static String updateName(String email, String fName, String lName, boolean host) {
 		String sql = "";
 		if(host) {
 			sql = "UPDATE Hosts SET fName=?, lName=? WHERE Email=?";
@@ -41,7 +41,7 @@ public class Guest {
 	 * indicate successful update
 	 * 
 	 */
-	protected String updatePronouns(String email, String pronouns, boolean host) {
+	public static String updatePronouns(String email, String pronouns, boolean host) {
 		String sql = "";
 		if(host) {
 			sql = "UPDATE Hosts SET Pronouns = ? WHERE Email = ?";
@@ -70,7 +70,7 @@ public class Guest {
 	 * saying so Else Store SessionID in Guest table Return successful message
 	 * 
 	 */
-	protected String joinRoom(String guestEmail, String hostEmail) {
+	public static String joinRoom(String guestEmail, String hostEmail) {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
 			PreparedStatement pr = conn.prepareStatement(sql);
@@ -117,7 +117,7 @@ public class Guest {
 	}
 
 	// guests leaving session
-	private static String leaveSession(String guestEmail) {
+	public static String leaveSession(String guestEmail) {
 		String sql = "UPDATE Guests SET SessionID = ?, Active = ? WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 			PreparedStatement pr = conn.prepareStatement(sql);) {
@@ -143,7 +143,7 @@ public class Guest {
 		int index = email.indexOf("@");
 
 		// pretty sure usc emails need to be at least 3 chars long
-		if (index < 3 || index > 100) {
+		if (index < 3 || index > 92) {
 			return false;
 		}
 
@@ -152,6 +152,13 @@ public class Guest {
 			return false;
 		}
 
+		return true;
+	}
+	
+	public static boolean invalidLength(String str) {
+		if(str.length() > 100 || str.length() < 1) {
+			return false;
+		}
 		return true;
 	}
 

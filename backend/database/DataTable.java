@@ -4,22 +4,21 @@ public class DataTable {
 	static final String DB_URL = "jdbc:mysql://localhost:3306/cs201final?";//?allowPublicKeyRetrieval=true&useSSL=false";
 	static final String USER = "root";
 	static final String PW = "root";
-
+	static DataTable dt;
+	static Guest g;
+	static Host h;
+	
 	public static void main(String[] args) {
 		String sql = "Connection ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			DataTable dt = new DataTable();
+			dt = new DataTable();
 			System.out.println(sql);
-			dt.createGuestTable();
-			dt.createHostTable();
+			DataTable.createGuestTable();
+			DataTable.createHostTable();
 			insertHost("test@usc.edu", "Bob", "Joe", "he/him/his/", "testSession");
 			insertGuest("test2@usc.edu", "Leon", "Zha", "he/him/his/", "test@usc.edu");
-
-			Guest g = new Guest();
-			Host h = new Host();
-			g.updateName("test@usc.edu", "Luncida", "Quintal?", false);
-		//	protected String updateName(String email, String fName, String lName, boolean host);
-			System.out.println("num guests: " + h.getNumGuestsInSession("test@usc.edu"));
+			Guest.updateName("test@usc.edu", "Luncida", "Quintal?", false);
+			System.out.println("num guests: " + Host.getNumGuestsInSession("test@usc.edu"));
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -42,7 +41,7 @@ public class DataTable {
 
 	
 	//add checks for limits and strig and hash
-	private void createGuestTable() {
+	public static void createGuestTable() {
 		
 		String sql = "DROP TABLE Guests";
 
@@ -50,12 +49,12 @@ public class DataTable {
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.executeUpdate();
 			sql = 	"CREATE TABLE Guests" +
-					"(Email VARCHAR(20) not NULL, " + 
-					"FName VARCHAR(20) not NULL, " +
-					"LName VARCHAR(20), " + 
-					"Pronouns VARCHAR(20), " +
-					"SessionID VARCHAR(20) not NULL, " +					
-					"Active VARCHAR(20) not NULL, " + 
+					"(Email VARCHAR(100) not NULL, " + 
+					"FName VARCHAR(100) not NULL, " +
+					"LName VARCHAR(100), " + 
+					"Pronouns VARCHAR(100), " +
+					"SessionID VARCHAR(100) not NULL, " +					
+					"Active VARCHAR(5) not NULL, " + 
 					"PRIMARY KEY (Email) )";
 			pr = conn.prepareStatement(sql);
 			pr.executeUpdate();
@@ -66,7 +65,7 @@ public class DataTable {
 	}
 	
 
-	public void createHostTable() {
+	public static void createHostTable() {
 		String sql = "DROP TABLE Hosts";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -74,11 +73,11 @@ public class DataTable {
 			pr.executeUpdate();
 			
 			sql = "CREATE TABLE Hosts" +
-			"(Email VARCHAR(40) not NULL, " + 
-			"FName VARCHAR(20) not NULL, " +
-			"LName VARCHAR(20), " + 
-			"Pronouns VARCHAR(20), " +
-			"InSession VARCHAR(20) not NULL, " +
+			"(Email VARCHAR(100) not NULL, " + 
+			"FName VARCHAR(100) not NULL, " +
+			"LName VARCHAR(100), " + 
+			"Pronouns VARCHAR(100), " +
+			"InSession VARCHAR(5) not NULL, " +
 			"EncryptedPassword VARCHAR(1000) not NULL," +
 			"Salt VARCHAR(1000) not NULL, " + 
 			"PRIMARY KEY (Email) )";
@@ -91,8 +90,19 @@ public class DataTable {
 	}
 	
 
+	
+
 	// todo: check valid email, no duplicate email
 	public static String insertHost(String email, String fName, String lName, String pronouns, String password) {
+		if(Guest.invalidLength(email) || Guest.invalidLength(fName) || Guest.invalidLength(lName) ||
+				Guest.invalidLength(pronouns) ) {
+			return "Could not insert host.";
+		}
+		
+		if(password.length() < 8 || password.length() > 20) {
+			return "Could not insert host.";
+		}
+		
 		String sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, " +
 				"EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?)";
 
@@ -121,6 +131,13 @@ public class DataTable {
 
 	// todo: check valid email, no duplicate email
 	private static String insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
+		
+		if(Guest.invalidLength(email) || Guest.invalidLength(fName) || Guest.invalidLength(lName) ||
+				Guest.invalidLength(pronouns) || Guest.invalidLength(sessionID)) {
+			return "Could not insert host.";
+		}
+			
+		
 		String sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement pr = conn.prepareStatement(sql);) {
