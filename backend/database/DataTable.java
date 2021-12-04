@@ -8,21 +8,21 @@ public class DataTable {
 	static Guest g;
 	static Host h;
 	
-	public static void main(String[] args) {
-		String sql = "Connection ?";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			dt = new DataTable();
-			System.out.println(sql);
-			DataTable.createGuestTable();
-			DataTable.createHostTable();
-			insertHost("test@usc.edu", "Bob", "Joe", "he/him/his/", "testSession");
-			insertGuest("test2@usc.edu", "Leon", "Zha", "he/him/his/", "test@usc.edu");
-			Guest.updateName("test@usc.edu", "Luncida", "Quintal?", false);
-			System.out.println("num guests: " + Host.getNumGuestsInSession("test@usc.edu"));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
+//	public static void i(String[] args) {
+//		String sql = "Connection ?";
+//		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+//			dt = new DataTable();
+//			System.out.println(sql);
+//			DataTable.createGuestTable();
+//			DataTable.createHostTable();
+//			insertHost("test@usc.edu", "Bob", "Joe", "he/him/his/", "testSession");
+//			insertGuest("test2@usc.edu", "Leon", "Zha", "he/him/his/", "test@usc.edu");
+//			Guest.updateName("test@usc.edu", "Luncida", "Quintal?", false);
+//			System.out.println("num guests: " + Host.getNumGuestsInSession("test@usc.edu"));
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+				
 		
 //		DataTable dt = new DataTable();
 //		
@@ -39,6 +39,15 @@ public class DataTable {
 
 	}
 
+	public static void initialize() {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			dt = new DataTable();
+			DataTable.createGuestTable();
+			DataTable.createHostTable();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 	
 	//add checks for limits and strig and hash
 	public static void createGuestTable() {
