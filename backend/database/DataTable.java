@@ -1,16 +1,19 @@
 import java.sql.*;
 
 public class DataTable {
-	static final String DB_URL = "jdbc:mysql://localhost/";
+	static final String DB_URL = "jdbc:mysql://localhost:3306/cs201final?";//?allowPublicKeyRetrieval=true&useSSL=false";
 	static final String USER = "root";
 	static final String PW = "root";
 
 	public static void main(String[] args) {
-		
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				Statement stmt = conn.createStatement();) {
-			System.out.println("Connection made! ");
-
+		String sql = "Connection ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			DataTable dt = new DataTable();
+			System.out.println(sql);
+			dt.createGuestTable();
+			dt.createHostTable();
+			insertGuest("test@usc.edu", "Leon", "Zha", "he/him/his/", "testSession");
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -31,19 +34,26 @@ public class DataTable {
 
 	}
 
+	
+	//add checks for limits and strig and hash
 	private void createGuestTable() {
-		String sql = "CREATE TABLE Hosts" +
-				"(Email STRING not NULL, " + 
-				"FName STRING not NULL, " +
-				"LName STRING, " + 
-				"Pronouns STRING, " +
-				"SessionID STRING not NULL, " +					
-				"Active not NULL, " + 
-				"PRIMARY KEY (Email) )";
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				PreparedStatement pr = conn.prepareStatement(sql);) {			
-			pr.executeUpdate();
+		
+		String sql = "DROP TABLE Guests";
 
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {		
+			PreparedStatement pr = conn.prepareStatement(sql);
+			pr.executeUpdate();
+			sql = 	"CREATE TABLE Guests" +
+					"(Email VARCHAR(20) not NULL, " + 
+					"FName VARCHAR(20) not NULL, " +
+					"LName VARCHAR(20), " + 
+					"Pronouns VARCHAR(20), " +
+					"SessionID VARCHAR(20) not NULL, " +					
+					"Active VARCHAR(20) not NULL, " + 
+					"PRIMARY KEY (Email) )";
+			pr = conn.prepareStatement(sql);
+			pr.executeUpdate();
+			pr.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -51,20 +61,24 @@ public class DataTable {
 	
 
 	public void createHostTable() {
-		String sql = "CREATE TABLE Hosts" +
-				"(Email STRING not NULL, " + 
-				"FName STRING not NULL, " +
-				"LName STRING, " + 
-				"Pronouns STRING, " +
-				"InSession STRING not NULL, " +
-				"EncryptedPassword not NULL," +
-				"Salt not NULL, " + 
-				"PRIMARY KEY (Email) )";
-		
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				PreparedStatement pr = conn.prepareStatement(sql);) {
-			pr.executeUpdate();
+		String sql = "DROP TABLE Hosts";
 
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			PreparedStatement pr = conn.prepareStatement(sql);
+			pr.executeUpdate();
+			
+			sql = "CREATE TABLE Hosts" +
+			"(Email VARCHAR(40) not NULL, " + 
+			"FName VARCHAR(20) not NULL, " +
+			"LName VARCHAR(20), " + 
+			"Pronouns VARCHAR(20), " +
+			"InSession VARCHAR(20) not NULL, " +
+			"EncryptedPassword VARCHAR(100) not NULL," +
+			"Salt VARCHAR(100) not NULL, " + 
+			"PRIMARY KEY (Email) )";
+			pr = conn.prepareStatement(sql);
+			pr.executeUpdate();
+			pr.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -110,7 +124,7 @@ public class DataTable {
 			pr.setString(2, fName);
 			pr.setString(3, lName);
 			pr.setString(4, pronouns);
-			pr.setString(5, "");
+			pr.setString(5, sessionID);
 			pr.setString(6, "false");
 			pr.executeUpdate();
 			
