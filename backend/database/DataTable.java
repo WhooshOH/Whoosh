@@ -37,7 +37,7 @@ public class DataTable {
 //		}
 //		
 
-	}
+//	}
 
 	public static void initialize() {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
