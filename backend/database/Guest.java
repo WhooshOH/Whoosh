@@ -27,7 +27,7 @@ public class Guest {
 			ps.setString(3, email);
 			ps.executeUpdate();
 			
-			return "Name successfully updated!";
+			return "";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -55,7 +55,7 @@ public class Guest {
 			ps.setString(2, email);
 			ps.executeUpdate();
 			
-			return "Pronouns updated successfully.";
+			return "";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -101,7 +101,7 @@ public class Guest {
 					
 					
 					
-					return "Succesfully joined room " + hostEmail;
+					return "";
 				}
 				
 				rs2.close();
@@ -127,7 +127,7 @@ public class Guest {
 			pr.setString(3, guestEmail);
 			pr.executeUpdate();
 			
-			return "Successfully left room. ";
+			return "";
 				
 		} catch(SQLException e) {
 			e.printStackTrace();

@@ -83,6 +83,8 @@ public class Host extends Guest {
 	 * SessionID
 	 * 
 	 */
+	
+	
 	public static String sessionGeneration(String hostEmail) {
 		String sql = "SELECT TABLE Hosts WHERE Email = ?";
 
@@ -92,6 +94,7 @@ public class Host extends Guest {
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
+				
 				sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, "True");
@@ -150,7 +153,7 @@ public class Host extends Guest {
 			if (rs.next()) {
 
 				// send link to email
-				return "Password Reset Link Successfully Sent";
+				return "";
 			}
 
 		} catch (SQLException e) {
@@ -188,7 +191,7 @@ public class Host extends Guest {
 			ps.executeUpdate();
 
 			ps.close();
-			return "Password reset successfully";
+			return "";
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -227,7 +230,7 @@ public class Host extends Guest {
 
 					rs.close();
 					pr.close();
-					return "Session ended.";
+					return "";
 				}
 			}
 
