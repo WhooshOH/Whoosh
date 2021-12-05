@@ -53,21 +53,46 @@ public class Host extends Guest {
 
 		String sql = "SELECT EncryptedPassword, Salt FROM Host WHERE Email = ?";
 
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-				PreparedStatement ps = conn.prepareStatement(sql);) {
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
 
+			//checking credentials
 			if (rs.next()) {
 				String storedPass = rs.getString("EncryptedPassword");
 				String salt = rs.getString("Salt");
 
 				String encrypted = encrypt(password, salt);
-				rs.close();
+				
+				if (encrypted.equals(storedPass)) {
+					
+					//ensure not already logged in
+					sql = "SELECT LoggedIn FROM Hosts WHERE Email = ?";
 
-				if (encrypted.equals(storedPass))
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, email);
+					rs = ps.executeQuery();
+						
+					String loggedIn = rs.getString("LoggedIn");
+					if(loggedIn.equals("True")) {
+						return "You're already logged in.";
+					}
+					
+					//actually logging in
+					sql = "UPDATE Hosts SET LogIn = ? WHERE Email = ?";
+					ps = conn.prepareStatement(sql);
+					ps.setString(1, "True");
+					ps.setString(2, email);
+					ps.executeUpdate();
+					
+					ps.close();
+					rs.close();
 					return "";
 
+				}
+				rs.close();
+				ps.close();	
 			}
 
 		} catch (SQLException e) {
@@ -86,24 +111,19 @@ public class Host extends Guest {
 	
 	
 	public static String sessionGeneration(String hostEmail) {
-		String sql = "SELECT TABLE Hosts WHERE Email = ?";
+		String sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, hostEmail);
-			ResultSet rs = ps.executeQuery();
-
-			if (rs.next()) {
+			
 				
-				sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, "True");
 				ps.setString(2, hostEmail);
-				ps.executeUpdate(sql);
-
+				ps.executeUpdate();
 				ps.close();
+				
 				return "";
-			}
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -161,6 +181,8 @@ public class Host extends Guest {
 		}
 		return "Failed to send password reset link. Try again.";
 	}
+	
+	
 
 	/*
 	 * Find table using email Encrypt email with new password Store encrypted
@@ -212,17 +234,18 @@ public class Host extends Guest {
 			PreparedStatement pr = conn.prepareStatement(sql);
 			pr.setString(1, hostEmail);
 			ResultSet rs = pr.executeQuery();
-
+			
 			// ensure the host exists
 			if (rs.next()) {
 
 				// ensure host is in session
 				if (rs.getString("InSession").equals("True")) {
-					sql = "UPDATE Hosts SET session ?";
+					sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 					pr = conn.prepareStatement(sql);
 					pr.setString(1, "False");
+					pr.setString(2, hostEmail);
 					pr.executeUpdate();
-
+					
 					sql = "DELETE FROM Guests WHERE sessionID = ?";
 					pr = conn.prepareStatement(sql);
 					pr.setString(1, hostEmail);
@@ -240,5 +263,26 @@ public class Host extends Guest {
 		}
 		return "Session failed to end. Try again. ";
 	}
+	
+	/**
+	 * Logout
+	 */
+	
+	public static String logOut(String email) {
+		String sql = "UPDATE Hosts SET LoggedIn = ? WHERE Email = ?";
+		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			PreparedStatement pr = conn.prepareStatement(sql);
+			pr.setString(1, "False");
+			pr.setString(2, email);
+			pr.executeUpdate();
+			return "";
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return "Couldn't log out, try again.";
+	}
+	
+	
 
 }

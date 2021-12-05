@@ -111,26 +111,24 @@ public class DataTable {
 			return "Please enter a password between 8 to 20 characters long.";
 		}
 
-		String sql = "SELECT LoggedIn FROM Hosts WHERE Email = ?";
+		String sql = "SELECT * FROM Hosts WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			
+			//check for duplicate account
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
 
 			if (rs.next()) {
-				String loggedIn = rs.getString("LogIn");
-				if (loggedIn.equals("True")) {
-					return "You're already logged in.";
-				}
-
+				rs.close();
 				return "Your account already exists.";
 			}
 
+			//actually insert 
 			sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, LoggedIn, "
 					+ "EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?,?)";
 
-			// get and check for duplicate email
 			String salt = Host.getSalt();
 			String encryptedPassword = Host.encrypt(password, salt);
 
@@ -166,7 +164,7 @@ public class DataTable {
 			ResultSet rs = pr.executeQuery();
 
 			if (rs.next()) {
-				return "You're already logged in.";
+				return "You're already in another session.";
 			} else {
 				sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
 				pr = conn.prepareStatement(sql);

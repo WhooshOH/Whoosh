@@ -133,7 +133,7 @@ public class Guest {
 			e.printStackTrace();
 		}
 		
-		return "Could not leaave room.";
+		return "Could not leave room.";
 	}
 	
 
