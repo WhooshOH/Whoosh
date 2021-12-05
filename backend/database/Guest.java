@@ -117,7 +117,7 @@ public class Guest {
 
 	// guests leaving session
 	public static String leaveSession(String guestEmail) {
-		String sql = "DELETE FROM Guests WHERE sessionID = ?";
+		String sql = "DELETE FROM Guests WHERE guestEmail = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
 			PreparedStatement pr = conn.prepareStatement(sql);
@@ -131,7 +131,7 @@ public class Guest {
 			e.printStackTrace();
 		}
 		
-		return "Could not leave room.";
+		return "Could not leave session.";
 	}
 	
 
