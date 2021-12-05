@@ -146,7 +146,7 @@ public class DataTable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		return "Could not insert host.";
+		return "Could not add host instance.";
 	}
 
 	// todo: check valid email, no duplicate email
@@ -166,23 +166,27 @@ public class DataTable {
 			if (rs.next()) {
 				return "You're already in another session.";
 			}
-
-			sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
-			pr = conn.prepareStatement(sql);
-			pr.setString(1, email);
-			pr.setString(2, fName);
-			pr.setString(3, lName);
-			pr.setString(4, pronouns);
-			pr.setString(5, sessionID);
-			pr.setString(6, "False");
-			pr.executeUpdate();
-			return "";
+			
+			String check = Host.isInSession(sessionID);
+			if(check.equals("")) {
+				sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
+				pr = conn.prepareStatement(sql);
+				pr.setString(1, email);
+				pr.setString(2, fName);
+				pr.setString(3, lName);
+				pr.setString(4, pronouns);
+				pr.setString(5, sessionID);
+				pr.setString(6, "False");
+				pr.executeUpdate();
+				return "";
+			}
+			return check;
 
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 
-		return "Could not insert guest.";
+		return "Could not create guest.";
 	}
 
 }

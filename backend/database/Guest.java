@@ -73,40 +73,39 @@ public class Guest {
 	public static String joinRoom(String guestEmail, String hostEmail) {
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
-			PreparedStatement pr = conn.prepareStatement(sql);
-			pr.setString(1, hostEmail);
-			ResultSet rs1 = pr.executeQuery();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, hostEmail);
+			ResultSet rs = ps.executeQuery();
 
 			// ensure valid email/session
-			if (rs1.next()) {
+			if (rs.next()) {
 				
 				
 				// ensure guest has no current session
 				sql = "SELECT SessionID FROM Guests WHERE Email = ?";
-				PreparedStatement ps = conn.prepareStatement(sql);
+				ps = conn.prepareStatement(sql);
 				ps.setString(1, guestEmail);
-				ResultSet rs2 = ps.executeQuery();
+				rs = ps.executeQuery();
+				if(rs.next()) {
+					String check = rs.getString("SessionID");
+					if(check.equals("")) {
+						//ensured no current session
+						sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
+						ps = conn.prepareStatement(sql);
+						ps.setString(1, guestEmail);
+						ps.setString(2, hostEmail);
+						ps.executeUpdate();
+						
+						rs.close();
+						ps.close();
+						
+						return "";
 
-				if (rs2.getString("SessionID").equals("")) {
-					// no current session
-					sql = "UPDATE Guests SET Active = ? WHERE Email = ?";
-					ps = conn.prepareStatement(sql);
-					ps.setString(1, "True");
-					ps.setString(2, guestEmail);
-					ps.executeUpdate();
-					
-					rs1.close();
-					rs2.close();
-					pr.close();
-					
-					
-					
-					return "";
+					}
 				}
-				
-				rs2.close();
-				rs1.close();
-				pr.close();
+				ps.close();
+				rs.close();
+				return "Invalid Session ID.";
 			}
 			
 
@@ -118,14 +117,13 @@ public class Guest {
 
 	// guests leaving session
 	public static String leaveSession(String guestEmail) {
-		String sql = "UPDATE Guests SET SessionID = ?, Active = ? WHERE Email = ?";
-		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
-			PreparedStatement pr = conn.prepareStatement(sql);) {
+		String sql = "DELETE FROM Guests WHERE sessionID = ?";
+		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			
-			pr.setString(1, "");
-			pr.setString(2, "False");
-			pr.setString(3, guestEmail);
+			PreparedStatement pr = conn.prepareStatement(sql);
+			pr.setString(1, guestEmail);
 			pr.executeUpdate();
+			pr.close();
 			
 			return "";
 				

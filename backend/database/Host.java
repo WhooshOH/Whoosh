@@ -113,7 +113,7 @@ public class Host extends Guest {
 	 */
 	
 	
-	public static String sessionGeneration(String hostEmail) {
+	public static String sessionGeneration(String email) {
 		String sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
@@ -122,7 +122,7 @@ public class Host extends Guest {
 				
 				ps = conn.prepareStatement(sql);
 				ps.setString(1, "True");
-				ps.setString(2, hostEmail);
+				ps.setString(2, email);
 				ps.executeUpdate();
 				ps.close();
 				
@@ -135,11 +135,11 @@ public class Host extends Guest {
 
 	}
 
-	public static String getNumGuestsInSession(String hostEmail) {
+	public static String getNumGuestsInSession(String email) {
 		String sql = "SELECT COUNT(*) FROM Guests WHERE SessionID = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW);
 				PreparedStatement ps = conn.prepareStatement(sql)) {
-			ps.setString(1, hostEmail);
+			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
 
 			// 0 is the column index...I think. SQL indexes generally start with 1
@@ -192,13 +192,13 @@ public class Host extends Guest {
 	 * password in table Send message back to indicate successful reset
 	 * 
 	 */
-	private static String resetPassword(String hostEmail, String password) {
+	private static String resetPassword(String email, String password) {
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 
 			String sql = "SELECT Salt FROM Hosts WHERE Email = ?";
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, hostEmail);
+			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
 			
 			String salt = "";
@@ -212,7 +212,7 @@ public class Host extends Guest {
 			sql = "UPDATE Hosts SET EncryptedPassword = ? WHERE Email = ?";
 			ps = conn.prepareStatement(sql);
 			ps.setString(1, newEncryptedPass);
-			ps.setString(2, hostEmail);
+			ps.setString(2, email);
 			ps.executeUpdate();
 
 			ps.close();
@@ -230,12 +230,12 @@ public class Host extends Guest {
 	 * indicate successful session end
 	 * 
 	 */
-	public static String endSession(String hostEmail) {
+	public static String endSession(String email) {
 
 		String sql = "SELECT InSession FROM Hosts WHERE Email = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement pr = conn.prepareStatement(sql);
-			pr.setString(1, hostEmail);
+			pr.setString(1, email);
 			ResultSet rs = pr.executeQuery();
 			
 			// ensure the host exists
@@ -246,12 +246,12 @@ public class Host extends Guest {
 					sql = "UPDATE Hosts SET InSession = ? WHERE Email = ?";
 					pr = conn.prepareStatement(sql);
 					pr.setString(1, "False");
-					pr.setString(2, hostEmail);
+					pr.setString(2, email);
 					pr.executeUpdate();
 					
 					sql = "DELETE FROM Guests WHERE sessionID = ?";
 					pr = conn.prepareStatement(sql);
-					pr.setString(1, hostEmail);
+					pr.setString(1, email);
 					pr.executeUpdate();
 
 					rs.close();
