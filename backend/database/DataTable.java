@@ -149,18 +149,25 @@ public class DataTable {
 		return "Could not add host instance.";
 	}
 
-	// todo: check valid email, no duplicate email
 	private static String insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
 
 		if (Guest.invalidLength(email) || Guest.invalidLength(fName) || Guest.invalidLength(lName)
 				|| Guest.invalidLength(pronouns) || Guest.invalidLength(sessionID)) {
-			return "Could not insert host.";
+			return "Could not insert Guest.";
 		}
+		
+		if(!Guest.validUSCEmail(email)) return "Invalid USC email.";
+		if(Guest.invalidLength(email)) return "Invalid email length.";
+		if(Guest.invalidLength(fName)) return "Invalid first name lenght.";
+		if(Guest.invalidLength(lName)) return "Invalid last name length.";
+		if(Guest.invalidLength(pronouns)) return "Invalid pronoun length.";
+		if(!Guest.validUSCEmail(sessionID)) return "Invalid email for sessionID.";
 
 		String sql = "SELECT Email FROM Guests WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement pr = conn.prepareStatement(sql);
+			pr.setString(1, email);
 			ResultSet rs = pr.executeQuery();
 
 			if (rs.next()) {

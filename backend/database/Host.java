@@ -288,7 +288,7 @@ public class Host extends Guest {
 	}
 	
 	public static String isInSession(String email) {
-		String sql = "SELECT InSession FROM Host WHERE Email = ?";
+		String sql = "SELECT InSession FROM Hosts WHERE Email = ?";
 		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, email);

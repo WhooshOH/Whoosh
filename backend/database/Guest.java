@@ -65,55 +65,6 @@ public class Guest {
 	}
 
 
-	/**
-	 * Check to ensure SessionID is valid If SessionID invalid: send back a message
-	 * saying so Else Store SessionID in Guest table Return successful message
-	 * 
-	 */
-	public static String joinRoom(String guestEmail, String hostEmail) {
-		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			String sql = "SELECT Email FROM Hosts WHERE Email = ?";
-			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setString(1, hostEmail);
-			ResultSet rs = ps.executeQuery();
-
-			// ensure valid email/session
-			if (rs.next()) {
-				
-				
-				// ensure guest has no current session
-				sql = "SELECT SessionID FROM Guests WHERE Email = ?";
-				ps = conn.prepareStatement(sql);
-				ps.setString(1, guestEmail);
-				rs = ps.executeQuery();
-				if(rs.next()) {
-					String check = rs.getString("SessionID");
-					if(check.equals("")) {
-						//ensured no current session
-						sql = "UPDATE Guests SET SessionID = ? WHERE Email = ?";
-						ps = conn.prepareStatement(sql);
-						ps.setString(1, guestEmail);
-						ps.setString(2, hostEmail);
-						ps.executeUpdate();
-						
-						rs.close();
-						ps.close();
-						
-						return "";
-
-					}
-				}
-				ps.close();
-				rs.close();
-				return "Invalid Session ID.";
-			}
-			
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return "Could not join room.";
-	}
 
 	// guests leaving session
 	public static String leaveSession(String guestEmail) {
@@ -155,9 +106,9 @@ public class Guest {
 	
 	public static boolean invalidLength(String str) {
 		if(str.length() > 100 || str.length() < 1) {
-			return false;
+			return true;
 		}
-		return true;
+		return false;
 	}
 
 
