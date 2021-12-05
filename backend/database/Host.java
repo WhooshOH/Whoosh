@@ -74,10 +74,13 @@ public class Host extends Guest {
 					ps.setString(1, email);
 					rs = ps.executeQuery();
 						
-					String loggedIn = rs.getString("LoggedIn");
-					if(loggedIn.equals("True")) {
-						return "You're already logged in.";
+					if(rs.next()) {
+						String loggedIn = rs.getString("LoggedIn");
+						if(loggedIn.equals("True")) {
+							return "You're already logged in.";
+						}
 					}
+
 					
 					//actually logging in
 					sql = "UPDATE Hosts SET LogIn = ? WHERE Email = ?";
@@ -271,10 +274,11 @@ public class Host extends Guest {
 	public static String logOut(String email) {
 		String sql = "UPDATE Hosts SET LoggedIn = ? WHERE Email = ?";
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			PreparedStatement pr = conn.prepareStatement(sql);
-			pr.setString(1, "False");
-			pr.setString(2, email);
-			pr.executeUpdate();
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, "False");
+			ps.setString(2, email);
+			ps.executeUpdate();
+			ps.close();
 			return "";
 		}catch(SQLException e) {
 			e.printStackTrace();
@@ -283,6 +287,29 @@ public class Host extends Guest {
 		return "Couldn't log out, try again.";
 	}
 	
+	public static String isInSession(String email) {
+		String sql = "SELECT InSession FROM Host WHERE Email = ?";
+		try(Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, email);
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				String inSession = rs.getString("InSession");
+				if(inSession.equals("True")) {
+					return "";
+				}
+				
+				return "Host not in session.";
+			}
+			return "Host account doesn't exist, try looking for another session.";
+		
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return "Couldn't determine if in session. Try again. ";
+	}
 	
 
 }

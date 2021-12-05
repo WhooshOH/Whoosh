@@ -114,8 +114,8 @@ public class DataTable {
 		String sql = "SELECT * FROM Hosts WHERE Email = ?";
 
 		try (Connection conn = DriverManager.getConnection(DB_URL, USER, PW)) {
-			
-			//check for duplicate account
+
+			// check for duplicate account
 			PreparedStatement ps = conn.prepareStatement(sql);
 			ps.setString(1, email);
 			ResultSet rs = ps.executeQuery();
@@ -125,7 +125,7 @@ public class DataTable {
 				return "Your account already exists.";
 			}
 
-			//actually insert 
+			// actually insert
 			sql = "INSERT INTO HOSTS (Email, FName, LName, Pronouns, InSession, LoggedIn, "
 					+ "EncryptedPassword, Salt) VALUES (?,?,?,?,?,?,?,?)";
 
@@ -165,18 +165,19 @@ public class DataTable {
 
 			if (rs.next()) {
 				return "You're already in another session.";
-			} else {
-				sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
-				pr = conn.prepareStatement(sql);
-				pr.setString(1, email);
-				pr.setString(2, fName);
-				pr.setString(3, lName);
-				pr.setString(4, pronouns);
-				pr.setString(5, sessionID);
-				pr.setString(6, "False");
-				pr.executeUpdate();
-				return "";
 			}
+
+			sql = "INSERT INTO GUESTS (Email, FName, LName, Pronouns, SessionID, Active) VALUES (?,?,?,?,?,?)";
+			pr = conn.prepareStatement(sql);
+			pr.setString(1, email);
+			pr.setString(2, fName);
+			pr.setString(3, lName);
+			pr.setString(4, pronouns);
+			pr.setString(5, sessionID);
+			pr.setString(6, "False");
+			pr.executeUpdate();
+			return "";
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
