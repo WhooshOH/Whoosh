@@ -102,12 +102,20 @@ public class DataTable {
 
 	// todo: check valid email, no duplicate email
 	public static String insertHost(String email, String fName, String lName, String pronouns, String password) {
-		if (Guest.invalidLength(email) || Guest.invalidLength(fName) || Guest.invalidLength(lName)
-				|| Guest.invalidLength(pronouns)) {
-			return "Entered field of invalid length.";
-		}
-
-		if (password.length() < 8 || password.length() > 20) {
+		if (Guest.invalidLength(email)) {
+			return "Invalid email length";
+		} else if(Guest.invalidLength(fName)) {
+			return "Invalid first name length";
+		} else if(Guest.invalidLength(lName)) {
+			return "Invalid last name length";
+		} else if(Guest.invalidLength(pronouns)) {
+			return "Invalid pronoun length.";
+		} else if(!Guest.isUnicode(fName) || !Guest.isUnicode(lName) || 
+				!Guest.isUnicode(pronouns) || !Guest.isUnicode(password)) {
+			return "Please ensure all entries are in unicode.";
+		} else if(!Guest.validUSCEmail(email)) {
+			return "Invalid email format.";
+		} else if (password.length() < 8 || password.length() > 20) {
 			return "Please enter a password between 8 to 20 characters long.";
 		}
 
@@ -151,17 +159,21 @@ public class DataTable {
 
 	private static String insertGuest(String email, String fName, String lName, String pronouns, String sessionID) {
 
-		if (Guest.invalidLength(email) || Guest.invalidLength(fName) || Guest.invalidLength(lName)
-				|| Guest.invalidLength(pronouns) || Guest.invalidLength(sessionID)) {
-			return "Could not insert Guest.";
+		if (Guest.invalidLength(email)) {
+			return "Invalid email length";
+		} else if(Guest.invalidLength(fName)) {
+			return "Invalid first name length";
+		} else if(Guest.invalidLength(lName)) {
+			return "Invalid last name length";
+		} else if(Guest.invalidLength(pronouns)) {
+			return "Invalid pronoun length.";
+		} else if(!Guest.isUnicode(fName) || !Guest.isUnicode(lName) || 
+				!Guest.isUnicode(pronouns)) {
+			return "Please ensure all entries are in unicode.";
+		} else if(!Guest.validUSCEmail(email)) {
+			return "Invalid email format.";
 		}
-		
-		if(!Guest.validUSCEmail(email)) return "Invalid USC email.";
-		if(Guest.invalidLength(email)) return "Invalid email length.";
-		if(Guest.invalidLength(fName)) return "Invalid first name lenght.";
-		if(Guest.invalidLength(lName)) return "Invalid last name length.";
-		if(Guest.invalidLength(pronouns)) return "Invalid pronoun length.";
-		if(!Guest.validUSCEmail(sessionID)) return "Invalid email for sessionID.";
+
 
 		String sql = "SELECT Email FROM Guests WHERE Email = ?";
 

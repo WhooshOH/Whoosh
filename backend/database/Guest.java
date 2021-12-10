@@ -95,6 +95,10 @@ public class Guest {
 		if (index < 3 || index > 92) {
 			return false;
 		}
+		
+		if(!validName(email)) {
+			return false;
+		}
 
 		String last = email.substring(index);
 		if (!last.equals("@usc.edu")) {
@@ -110,6 +114,26 @@ public class Guest {
 		}
 		return false;
 	}
+	
+    //check for username/password/name
+    public static boolean validName(String name) {
+        if(!invalidLength(name) && !isUnicode(name)){
+            return true;
+        }
+        return false;
+    }
+    
+    
+    //check if user input included Unicode Characters
+    public static boolean isUnicode(String input)
+    {
+        for(int i = 0; i < input.length(); i++){
+            if(Character.UnicodeBlock.of(input.charAt(i)) != Character.UnicodeBlock.BASIC_LATIN) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 
 
